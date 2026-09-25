@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miss boba's cafe lookbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3E2C6;--card:#FFF9EF;--ink:#3A2419;--muted:#7C5E48;--chip:#5A3826;--chipText:#FBEFDD;--line:#E4D1B6;--stage:#F7ECDD;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#24170F;--card:#34231A;--ink:#FBEFDD;--muted:#D9C3A2;--chip:#F2C98E;--chipText:#2A1B12;--line:#4E3726;--stage:#3E2A1E}}
+:root[data-theme="dark"]{--bg:#24170F;--card:#34231A;--ink:#FBEFDD;--muted:#D9C3A2;--chip:#F2C98E;--chipText:#2A1B12;--line:#4E3726;--stage:#3E2A1E}
+*,*::before,*::after{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;line-height:1.4}
+main{max-width:1040px;margin:0 auto;padding:32px 18px 56px}
+h1{font-family:"Gaegu","Comic Sans MS",cursive;font-size:clamp(2.4rem,6vw,3.4rem);line-height:1}
+.lede{color:var(--muted);margin:8px 0 26px;max-width:60ch}
+section{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px 18px 20px;margin-bottom:18px}
+section header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:14px}
+h2{font-size:1.25rem;font-weight:600}
+code{font-family:inherit;font-weight:600;background:var(--chip);color:var(--chipText);border-radius:6px;padding:1px 8px 2px;font-size:.92rem;white-space:nowrap}
+.hint{color:var(--muted);font-size:.92rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.item{background:var(--stage);border-radius:12px;padding:8px 6px 10px;text-align:center}
+.item svg{display:block;width:84px;height:126px;margin:0 auto}
+.item b{display:block;font-weight:600;font-size:.95rem;margin-top:2px}
+.item span{display:block;color:var(--muted);font-size:.8rem}
+.sw{width:14px;height:14px;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.15)}
+.sprite .sitlegs,.sprite .laptop,.sprite .eyesClosed,.sprite .cup{display:none}
+.show-cup .sprite .cup{display:inline}
+/* builder */
+.builder{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:18px;align-items:start}
+@media (max-width:640px){.builder{grid-template-columns:1fr}}
+.preview{background:var(--stage);border-radius:14px;padding:12px;text-align:center}
+.preview svg{width:150px;height:225px;display:block;margin:0 auto}
+.controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+select{font:inherit;color:var(--ink);background:var(--stage);border:1.5px solid var(--line);border-radius:8px;padding:7px 8px}
+.cmds{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+.copy{margin-top:12px;font:inherit;font-weight:600;border:0;border-radius:10px;padding:9px 14px;background:#E890AB;color:#3A2419;cursor:pointer}
+.copy:focus-visible,select:focus-visible{outline:3px solid var(--chip);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+  <h1>miss boba's cafe lookbook</h1>
+  <p class="lede">customize your character! each option shows the command to type in chat.</p>
+
+  <section>
+    <header><h2>Try a look</h2><span class="hint">use the dropdown menu to choose your design, then copy the commands.</span></header>
+    <div class="builder">
+      <div class="preview show-cup" id="builderPreview"></div>
+      <div>
+        <div class="controls" id="controls"></div>
+        <div class="cmds" id="cmds"></div>
+        <button class="copy" id="copyBtn" type="button">Copy commands</button>
+      </div>
+    </div>
+  </section>
+
+  <section><header><h2>Hairstyles</h2><code>!hair</code><span class="hint">number or name, like !hair curly</span></header><div class="grid" id="gHair"></div></section>
+  <section><header><h2>Hair colors</h2><code>!haircolor</code><span class="hint">name or any #hex, like !haircolor #ff99cc</span></header><div class="grid" id="gHairColor"></div></section>
+  <section><header><h2>Skin tones</h2><code>!skin</code></header><div class="grid" id="gSkin"></div></section>
+  <section><header><h2>Outfits</h2><code>!outfit</code><span class="hint">color or any #hex</span></header><div class="grid" id="gOutfit"></div></section>
+  <section><header><h2>Hats</h2><code>!hat</code><span class="hint">!hat none takes it off</span></header><div class="grid" id="gHat"></div></section>
+  <section><header><h2>Glasses</h2><code>!glasses</code><span class="hint">!glasses on its own toggles round glasses on and off</span></header><div class="grid" id="gGlasses"></div></section>
+  <section><header><h2>Mouths</h2><code>!mouth</code><span class="hint">number or name, like !mouth grin</span></header><div class="grid" id="gMouth"></div></section>
+  <section><header><h2>Drinks</h2><code>!drink</code><span class="hint">!drink on its own picks a random different one</span></header><div class="grid show-cup" id="gDrink"></div></section>
+  <section><header><h2>Surprise me</h2><code>!random</code><span class="hint">a whole new random look, a few examples below</span></header><div class="grid" id="gRandom"></div></section>
+</main>
+<script>
+(() => {
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+const hash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const validHex = c => /^#[0-9a-f]{6}$/i.test(c || "");
+function mix(hex, target, amt) {
+  const p = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+  const a = p(hex), b = p(target);
+  return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * amt).toString(16).padStart(2, "0")).join("");
+}
+
+/* ---------- looks ---------- */
+const SKIN = ["#FDE7D6","#F6D2B8","#EBB994","#D59D76","#B97D58","#8C5A3E"];
+const HAIR_STYLES = ["bob","long","short","buns","pigtails","ponytail","curly","messy","wavy","bald"];
+const GLASSES = ["none","round","rectangle","heart"];
+const MOUTHS = ["cat","smile","grin","tongue","oh","smirk","flat","kiss"];
+function mouthSVG(m) {
+  const st = 'stroke="#7A3B2E" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  switch (m) {
+    case "smile": return `<path d="M36.5 55.3q3.5 3.4 7 0" ${st}/>`;
+    case "grin": return `<path d="M35.8 54.9h8.4q-.5 4.9-4.2 4.9t-4.2-4.9z" fill="#7A3B2E"/><path d="M37.6 58.3q2.4-1.7 4.8 0q-1 1.4-2.4 1.4t-2.4-1.4z" fill="#F28DAA"/>`;
+    case "tongue": return `<path d="M36.5 55.3q3.5 2.6 7 0" ${st}/><path d="M39.1 56.4h3.4v1.8a1.7 1.7 0 0 1-3.4 0z" fill="#F28DAA"/>`;
+    case "oh": return `<ellipse cx="40" cy="57" rx="1.9" ry="2.4" fill="#7A3B2E"/>`;
+    case "smirk": return `<path d="M37.2 56.8q3.2 1 5.8-1.8" ${st}/>`;
+    case "flat": return `<path d="M37.4 56.4h5.2" ${st}/>`;
+    case "kiss": return `<path d="M39.3 54.6q2.4 1 0 1.9q2.4 1 0 1.9" ${st}/>`;
+    default: return `<path d="M37 56q1.5 1.8 3 0q1.5 1.8 3 0" ${st}/>`;
+  }
+}
+
+const HAIR_COLORS = { dark:"#3A2419", brown:"#5B3A26", black:"#1F1A24", chestnut:"#8A5A3A", caramel:"#C98E5A", blonde:"#E9C98F",
+  ginger:"#C8643B", red:"#B2475A", pink:"#F2A2C0", taro:"#A98BC9", purple:"#6D4C7D", blue:"#5A7FC0", navy:"#2F3E5C",
+  mint:"#8FD1B8", silver:"#C9C9D6", white:"#F2EEE8" };
+const NATURAL_HAIR = ["dark","brown","black","chestnut","caramel","blonde"];
+const OUTFITS = { taro:"#9C7BB5", matcha:"#8DAA6A", strawberry:"#E8A0A8", mango:"#E6B36A", sky:"#7FA8B8", cocoa:"#8A5A3B",
+  cream:"#F2E3C9", sage:"#6F8F7A", peach:"#F0B495", lavender:"#C3A5E8", mint:"#9ED6C0", navy:"#3E4A7A", black:"#3A3440",
+  red:"#C4515C", yellow:"#F2D36B", pink:"#F4B6C8", white:"#F7F2EA" };
+const PANTS = ["#4A3A55","#3E4A5C","#5B4636","#2F3A33","#6B5A4A"];
+const HATS = ["none","beanie","bow","cat","bunny","frog","flower","headphones","crown"];
+const NAME_COLORS = ["#F2A2B0","#B89BD1","#9DBB74","#EDA35A","#8FC1D4","#F4D06F","#E58F7C","#C3A5E8"];
+const DRINKS = [
+  { name: "brown sugar pearl", color: "#C08A5B" }, { name: "taro cloud", color: "#B89BD1" },
+  { name: "matcha latte", color: "#9DBB74" }, { name: "strawberry oolong", color: "#F2A2B0" },
+  { name: "thai milk tea", color: "#EDA35A" }, { name: "lychee green", color: "#F6DC7A" },
+  { name: "honeydew", color: "#B8DDA8" }, { name: "black sesame", color: "#8C8378" }
+];
+const nameColor = (login, c) => validHex(c) ? mix(c, "#FFFFFF", .35) : NAME_COLORS[hash(login) % NAME_COLORS.length];
+const nameInk = (login, c) => mix(validHex(c) ? c : NAME_COLORS[hash(login) % NAME_COLORS.length], "#3A2419", .45);
+const colorFrom = (arg, table) => { const a = (arg || "").toLowerCase().replace(/\s+/g, ""); return table[a] || (validHex(a) ? a : null); };
+
+function defaultLook(login) {
+  const h = hash(login), h2 = hash(login + "~");
+  const outfitKeys = Object.keys(OUTFITS);
+  return {
+    skin: h % SKIN.length,
+    style: (h >>> 4) % (HAIR_STYLES.length - 1),
+    hair: HAIR_COLORS[h2 % 5 === 0 ? pick(["pink","taro","mint","blue","silver"]) : NATURAL_HAIR[(h >>> 8) % NATURAL_HAIR.length]],
+    shirt: OUTFITS[outfitKeys[(h >>> 12) % outfitKeys.length]],
+    pants: PANTS[(h >>> 16) % PANTS.length],
+    hat: h2 % 4 === 0 ? HATS[1 + (h2 >>> 3) % (HATS.length - 1)] : "none",
+    glasses: (h2 >>> 7) % 7 === 0 ? "round" : "none",
+    mouth: "cat"
+  };
+}
+function randomLook() {
+  const o = Object.values(OUTFITS), hc = Object.values(HAIR_COLORS);
+  return { skin: Math.floor(Math.random() * SKIN.length), style: Math.floor(Math.random() * HAIR_STYLES.length),
+    hair: pick(hc), shirt: pick(o), pants: pick(PANTS), hat: Math.random() < .55 ? pick(HATS.slice(1)) : "none", glasses: Math.random() < .3 ? pick(GLASSES.slice(1)) : "none", mouth: pick(MOUTHS) };
+}
+
+function hairParts(style, c) {
+  const hl = `<path d="M27 31q6-6 14-6" stroke="#fff" stroke-opacity=".28" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  const bobBack = `<path d="M16 50C14 24 27 20 40 20C53 20 66 24 64 50L64 64C60 67 57 63 57 58L23 58C23 63 20 67 16 64Z" fill="${c}"/>`;
+  const tiedBack = `<path d="M17 50C15 24 27 20 40 20C53 20 65 24 63 50Z" fill="${c}"/>`;
+  const bangs = `<path d="M17 47C15 28 27 20 41 20C55 20 65 28 63 47C61 45 59.5 43.5 58 42.5C51 38.5 41 36.5 31 31C28 36 23 41.5 17 47Z" fill="${c}"/>` + hl;
+  const short = `<path d="M17 46C16 26 28 19 40 19C53 19 64 26 63 46C60 38 54 33 47 33C41 30 33 31 28 35C23 36 19 40 17 46Z" fill="${c}"/>` + hl;
+  switch (style) {
+    case 1: return [`<path d="M15 48C13 22 27 19 40 19C53 19 67 22 65 48L66 88C60 92 55 86 54 78L26 78C25 86 20 92 14 88Z" fill="${c}"/>`, bangs];
+    case 2: return ["", short];
+    case 3: return [`<circle cx="21" cy="24" r="9.5" fill="${c}"/><circle cx="59" cy="24" r="9.5" fill="${c}"/>` + tiedBack, bangs];
+    case 4: return [`<ellipse cx="13" cy="60" rx="7.5" ry="13" fill="${c}" transform="rotate(12 13 60)"/><ellipse cx="67" cy="60" rx="7.5" ry="13" fill="${c}" transform="rotate(-12 67 60)"/>` + bobBack,
+      bangs + `<circle cx="16" cy="49" r="3" fill="#F28DAA"/><circle cx="64" cy="49" r="3" fill="#F28DAA"/>`];
+    case 5: return [`<path d="M50 21C64 13 76 25 73 42C71 54 75 63 69 74C66 77 63 75 63 71C64 63 60 55 61 46C62 37 59 29 52 26Z" fill="${c}"/><path d="M66 32C69 42 66 52 69 62" stroke="#fff" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/>` + tiedBack,
+      bangs + `<ellipse cx="55" cy="22.5" rx="3.6" ry="3" fill="#F28DAA"/>`];
+    case 6: {
+      let b = "", f = "";
+      [[17,56],[63,56],[15,45],[65,45]].forEach(([x, y]) => b += `<circle cx="${x}" cy="${y}" r="8.5" fill="${c}"/>`);
+      for (let a = 195; a <= 345; a += 21) { const r = a * Math.PI / 180; f += `<circle cx="${(40 + Math.cos(r) * 20).toFixed(1)}" cy="${(43 + Math.sin(r) * 20).toFixed(1)}" r="8.6" fill="${c}"/>`; }
+      return [b, f];
+    }
+    case 8: return [`<path d="M15 48C13 22 27 19 40 19C53 19 67 22 65 48C70 55 62 61 67 68C72 75 63 81 67 88C61 93 56 88 55 80L25 80C24 88 19 93 13 88C17 81 8 75 13 68C18 61 10 55 15 48Z" fill="${c}"/>`,
+      bangs + `<path d="M18 44C13 50 20 55 16 61C13 66 19 70 17 74" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M62 44C67 50 60 55 64 61C67 66 61 70 63 74" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/>`];
+    case 9: return ["", `<path d="M27 31q7-7 16-6" stroke="#fff" stroke-opacity=".38" stroke-width="2.8" fill="none" stroke-linecap="round"/>`];
+    case 7: return ["", short + `<path d="M41 20q-3-11 9-13q-7 5-5 13z" fill="${c}"/>`];
+    default: return [bobBack, bangs];
+  }
+}
+function hatSVG(hat, hairC, acc) {
+  const dark = mix(acc, "#3A2419", .3), light = mix(acc, "#FFFFFF", .45);
+  switch (hat) {
+    case "beanie": return `<path d="M16 39C16 20 28 15 40 15C52 15 64 20 64 39Z" fill="${acc}"/><rect x="15" y="35" width="50" height="8" rx="4" fill="${dark}"/><circle cx="40" cy="13" r="5.5" fill="${light}"/>`;
+    case "bow": return `<g transform="translate(55,26) rotate(15)">
+      <path d="M-1 1.5C-2.5 5.5-4.5 8.5-6 11.5L-2.8 12C-1.8 9-.6 6 .6 2.5Z" fill="#E06C8E"/><path d="M1 1.5C2.5 5.5 4.5 8.5 6 11.5L2.8 12C1.8 9 .6 6-.6 2.5Z" fill="#E06C8E"/>
+      <path d="M0 0C-3.5-7.5-12.5-10-13.8-3.5C-15 2.8-6.5 5.5 0 0Z" fill="#F28DAA"/><path d="M0 0C3.5-7.5 12.5-10 13.8-3.5C15 2.8 6.5 5.5 0 0Z" fill="#F28DAA"/>
+      <path d="M-2.5-.5C-5-4-9-5.5-10.5-3.5" stroke="#E06C8E" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M2.5-.5C5-4 9-5.5 10.5-3.5" stroke="#E06C8E" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-9" cy="-4.8" rx="2" ry="1.2" fill="#fff" opacity=".45" transform="rotate(-20 -9 -4.8)"/>
+      <ellipse rx="3.3" ry="3.7" fill="#E06C8E"/><ellipse cx="-.8" cy="-1" rx="1.1" ry="1" fill="#fff" opacity=".35"/></g>`;
+    case "cat": {
+      const ear = (x, y, r) => `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M-7.5 2C-6.5-6-3.5-12.5 0-13.5C3.5-12.5 6.5-6 7.5 2Q0-1.5-7.5 2Z" fill="${hairC}"/><path d="M-3.8-.5C-3.3-5.5-1.7-9.2 0-9.8C1.7-9.2 3.3-5.5 3.8-.5Q0-2-3.8-.5Z" fill="#F4B6C8"/></g>`;
+      return ear(25, 25, -30) + ear(55, 25, 30);
+    }
+    case "bunny": return `<ellipse cx="30" cy="6" rx="5.8" ry="15" fill="#FBF6F0" transform="rotate(-10 30 6)"/><ellipse cx="30" cy="7" rx="2.7" ry="10" fill="#F4B6C8" transform="rotate(-10 30 7)"/><ellipse cx="50" cy="6" rx="5.8" ry="15" fill="#FBF6F0" transform="rotate(10 50 6)"/><ellipse cx="50" cy="7" rx="2.7" ry="10" fill="#F4B6C8" transform="rotate(10 50 7)"/>`;
+    case "frog": return `<path d="M16 37C16 20 28 16 40 16C52 16 64 20 64 37Z" fill="#8DC47A"/><circle cx="29" cy="16" r="7" fill="#8DC47A"/><circle cx="51" cy="16" r="7" fill="#8DC47A"/><circle cx="29" cy="16" r="4" fill="#fff"/><circle cx="51" cy="16" r="4" fill="#fff"/><circle cx="29.6" cy="16.6" r="2.1" fill="#2E1D15"/><circle cx="51.6" cy="16.6" r="2.1" fill="#2E1D15"/><path d="M33 30q7 4 14 0" stroke="#5E8F4E" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    case "flower": { let p = ""; for (let i = 0; i < 5; i++) { const a = i * 72 * Math.PI / 180; p += `<circle cx="${(56 + Math.cos(a) * 4.4).toFixed(1)}" cy="${(27 + Math.sin(a) * 4.4).toFixed(1)}" r="3.8" fill="#FFF1F4"/>`; } return p + `<circle cx="56" cy="27" r="2.8" fill="#F2C94C"/>`; }
+    case "headphones": return `<path d="M15 47C15 22 26 14 40 14C54 14 65 22 65 47" stroke="${acc}" stroke-width="4.5" fill="none"/><rect x="10" y="40" width="10" height="17" rx="5" fill="${acc}"/><rect x="60" y="40" width="10" height="17" rx="5" fill="${acc}"/><rect x="12" y="44" width="6" height="9" rx="3" fill="${light}"/><rect x="62" y="44" width="6" height="9" rx="3" fill="${light}"/>`;
+    case "crown": return `<path d="M29 23L29 11L34.5 17L40 8L45.5 17L51 11L51 23Z" fill="#F2C94C" stroke="#D9A93A" stroke-width="1"/><circle cx="40" cy="16" r="1.8" fill="#E8A0A8"/>`;
+    default: return "";
+  }
+}
+function spriteSVG(k) {
+  const skin = SKIN[k.skin] || SKIN[0];
+  const [back, front] = hairParts(k.style, k.hair);
+  const shoe = "#3B2A22";
+  const g = k.glasses === true ? "round" : (k.glasses || "none");
+  const heart = x => `M${x} 57C${x - 7} 52.5 ${x - 7.5} 47.5 ${x - 4.5} 45.5C${x - 2.5} 44.3 ${x - .7} 45 ${x} 46.8C${x + .7} 45 ${x + 2.5} 44.3 ${x + 4.5} 45.5C${x + 7.5} 47.5 ${x + 7} 52.5 ${x} 57Z`;
+  const glasses = g === "round" ? `<g fill="rgba(255,255,255,.12)" stroke="#3A2419" stroke-width="1.5"><circle cx="31.5" cy="50" r="6.4"/><circle cx="48.5" cy="50" r="6.4"/></g><path d="M37.9 49.5h4.2" stroke="#3A2419" stroke-width="1.5"/>`
+    : g === "rectangle" ? `<g fill="rgba(255,255,255,.12)" stroke="#3A2419" stroke-width="1.6"><rect x="24.5" y="45.3" width="13.6" height="9.6" rx="2"/><rect x="41.9" y="45.3" width="13.6" height="9.6" rx="2"/></g><path d="M38.1 49h3.8" stroke="#3A2419" stroke-width="1.6"/>`
+    : g === "heart" ? `<g fill="rgba(242,141,170,.3)" stroke="#E06C8E" stroke-width="1.6" stroke-linejoin="round"><path d="${heart(31.5)}"/><path d="${heart(48.5)}"/></g><path d="M36.3 48.6q3.7-2 7.4 0" stroke="#E06C8E" stroke-width="1.5" fill="none"/>`
+    : "";
+  return `<svg class="sprite" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="shadow" cx="40" cy="115" rx="16" ry="4" fill="rgba(35,18,10,.3)"/>
+    <g class="legs">
+      <g class="legL"><rect x="33.5" y="94" width="6.5" height="16" rx="3.2" fill="${k.pants}"/><ellipse cx="36.5" cy="111.5" rx="5" ry="3.2" fill="${shoe}"/></g>
+      <g class="legR"><rect x="40" y="94" width="6.5" height="16" rx="3.2" fill="${k.pants}"/><ellipse cx="43.5" cy="111.5" rx="5" ry="3.2" fill="${shoe}"/></g>
+    </g>
+    <g class="sitlegs"><rect x="37" y="91" width="18" height="7.5" rx="3.7" fill="${k.pants}"/><rect x="49" y="93" width="6.5" height="9" rx="3.2" fill="${k.pants}"/><ellipse cx="53.5" cy="103" rx="4.8" ry="3" fill="${shoe}"/></g>
+    ${back}
+    <path d="M28 98C27 83 31 71 40 70C49 71 53 83 52 98Z" fill="${k.shirt}"/>
+    <ellipse cx="29" cy="84" rx="4" ry="8.5" fill="${k.shirt}" transform="rotate(16 29 84)"/>
+    <ellipse cx="51" cy="84" rx="4" ry="8.5" fill="${k.shirt}" transform="rotate(-16 51 84)"/>
+    <circle cx="27" cy="91" r="3.4" fill="${skin}"/><circle cx="53" cy="91" r="3.4" fill="${skin}"/>
+    <circle cx="40" cy="46" r="23" fill="${skin}"/>
+    <ellipse cx="28" cy="56.5" rx="4.2" ry="2.5" fill="#F59A9A" opacity=".55"/><ellipse cx="52" cy="56.5" rx="4.2" ry="2.5" fill="#F59A9A" opacity=".55"/>
+    <g class="eyesOpen"><ellipse cx="31.5" cy="50.5" rx="3.3" ry="4.3" fill="#2E1D15"/><ellipse cx="48.5" cy="50.5" rx="3.3" ry="4.3" fill="#2E1D15"/>
+      <circle cx="32.7" cy="48.7" r="1.35" fill="#fff"/><circle cx="49.7" cy="48.7" r="1.35" fill="#fff"/>
+      <circle cx="30.5" cy="52.3" r=".6" fill="#fff"/><circle cx="47.5" cy="52.3" r=".6" fill="#fff"/></g>
+    <g class="eyesClosed" stroke="#2E1D15" stroke-width="1.7" fill="none" stroke-linecap="round"><path d="M28 50.5q3.5 3 7 0"/><path d="M45 50.5q3.5 3 7 0"/></g>
+    ${mouthSVG(k.mouth)}
+    ${front}${glasses}${hatSVG(k.hat, k.hair, k.shirt)}
+    <g class="cup" transform="translate(48,76)">
+      <path d="M0 4L12 4L10.5 20L1.5 20Z" style="fill:var(--drink)" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>
+      <rect x="-.5" y="2" width="13" height="3" rx="1.5" fill="#F7EFE6"/>
+      <rect x="7" y="-6" width="2" height="9" fill="#F7EFE6" transform="rotate(12 8 -1)"/>
+      <circle cx="4" cy="17" r="1.4" fill="#3A2419"/><circle cx="7.5" cy="17.5" r="1.4" fill="#3A2419"/><circle cx="6" cy="14.8" r="1.3" fill="#3A2419"/>
+    </g>
+    <g class="laptop" transform="translate(53,80)">
+      <rect x="0" y="0" width="17" height="12" rx="1.6" fill="#CFC6D8"/><rect x="1.6" y="1.6" width="13.8" height="8.8" rx="1" fill="#FFE9B8"/>
+      <rect x="-2.5" y="12" width="21" height="3" rx="1.3" fill="#B7ADC2"/>
+    </g>
+  </svg>`;
+}
+
+const DRINK_LIST = [
+  { name: "brown sugar pearl", cmd: "brown", color: "#C08A5B" }, { name: "taro cloud", cmd: "taro", color: "#B89BD1" },
+  { name: "matcha latte", cmd: "matcha", color: "#9DBB74" }, { name: "strawberry oolong", cmd: "strawberry", color: "#F2A2B0" },
+  { name: "thai milk tea", cmd: "thai", color: "#EDA35A" }, { name: "lychee green", cmd: "lychee", color: "#F6DC7A" },
+  { name: "honeydew", cmd: "honeydew", color: "#B8DDA8" }, { name: "black sesame", cmd: "sesame", color: "#8C8378" }
+];
+const BASE = { skin: 1, style: 0, hair: HAIR_COLORS.brown, shirt: OUTFITS.strawberry, pants: PANTS[0], hat: "none", glasses: "none", mouth: "cat" };
+const card = (look, title, sub, drink) =>
+  `<div class="item" style="--drink:${drink || "#B89BD1"}">${spriteSVG(Object.assign({}, BASE, look))}<b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>`;
+const fill = (id, html) => document.getElementById(id).innerHTML = html;
+
+fill("gHair", HAIR_STYLES.map((n, i) => card({ style: i }, `${i + 1}. ${n}`, `!hair ${i + 1}`)).join(""));
+fill("gHairColor", Object.entries(HAIR_COLORS).map(([n, c]) => card({ hair: c, style: 1 }, `<i class="sw" style="background:${c}"></i>${n}`, `!haircolor ${n}`)).join(""));
+fill("gSkin", SKIN.map((c, i) => card({ skin: i, style: 2 }, `<i class="sw" style="background:${c}"></i>${i + 1}`, `!skin ${i + 1}`)).join(""));
+fill("gOutfit", Object.entries(OUTFITS).map(([n, c]) => card({ shirt: c }, `<i class="sw" style="background:${c}"></i>${n}`, `!outfit ${n}`)).join(""));
+fill("gHat", HATS.map(h => card({ hat: h, style: h === "cat" || h === "bunny" ? 2 : 0 }, h, `!hat ${h}`)).join(""));
+fill("gGlasses", GLASSES.map(g => card({ glasses: g }, g === "none" ? "off" : g, `!glasses ${g === "none" ? "off" : g}`)).join(""));
+fill("gMouth", MOUTHS.map((m, i) => card({ mouth: m }, `${i + 1}. ${m}`, `!mouth ${i + 1}`)).join(""));
+fill("gDrink", DRINK_LIST.map(d => card({}, `<i class="sw" style="background:${d.color}"></i>${d.name}`, `!drink ${d.cmd}`, d.color)).join(""));
+const seeded = seed => { let x = seed; return () => (x = (x * 16807) % 2147483647) / 2147483647; };
+const r = seeded(7);
+const pickR = a => a[Math.floor(r() * a.length)];
+fill("gRandom", [...Array(6)].map(() => card({ skin: Math.floor(r() * SKIN.length), style: Math.floor(r() * HAIR_STYLES.length), hair: pickR(Object.values(HAIR_COLORS)),
+  shirt: pickR(Object.values(OUTFITS)), pants: pickR(PANTS), hat: r() < .6 ? pickR(HATS.slice(1)) : "none", glasses: r() < .35 ? pickR(GLASSES.slice(1)) : "none", mouth: pickR(MOUTHS) }, "random", "!random")).join(""));
+
+/* builder */
+const state = { style: 0, hair: "brown", skin: 2, outfit: "strawberry", hat: "none", glasses: "off", mouth: "cat", drink: 1 };
+const fields = [
+  ["style", "Hairstyle", HAIR_STYLES.map((n, i) => [i, `${i + 1}. ${n}`])],
+  ["hair", "Hair color", Object.keys(HAIR_COLORS).map(n => [n, n])],
+  ["skin", "Skin tone", SKIN.map((_, i) => [i + 1, String(i + 1)])],
+  ["outfit", "Outfit", Object.keys(OUTFITS).map(n => [n, n])],
+  ["hat", "Hat", HATS.map(h => [h, h])],
+  ["glasses", "Glasses", GLASSES.map(g => [g === "none" ? "off" : g, g === "none" ? "off" : g])],
+  ["mouth", "Mouth", MOUTHS.map((m, i) => [m, `${i + 1}. ${m}`])],
+  ["drink", "Drink", DRINK_LIST.map((d, i) => [i, d.name])]
+];
+const controls = document.getElementById("controls");
+controls.innerHTML = fields.map(([k, label, opts]) =>
+  `<label>${label}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}"${String(v) === String(state[k]) ? " selected" : ""}>${t}</option>`).join("")}</select></label>`).join("");
+function commands() {
+  return [`!hair ${Number(state.style) + 1}`, `!haircolor ${state.hair}`, `!skin ${state.skin}`, `!outfit ${state.outfit}`,
+    `!hat ${state.hat}`, `!glasses ${state.glasses}`, `!mouth ${state.mouth}`, `!drink ${DRINK_LIST[state.drink].cmd}`];
+}
+function drawBuilder() {
+  const d = DRINK_LIST[state.drink];
+  document.getElementById("builderPreview").style.setProperty("--drink", d.color);
+  document.getElementById("builderPreview").innerHTML = spriteSVG({ skin: Number(state.skin) - 1, style: Number(state.style), hair: HAIR_COLORS[state.hair],
+    shirt: OUTFITS[state.outfit], pants: PANTS[0], hat: state.hat, glasses: state.glasses === "off" ? "none" : state.glasses, mouth: state.mouth });
+  document.getElementById("cmds").innerHTML = commands().map(c => `<code>${c}</code>`).join("");
+}
+controls.addEventListener("change", e => { const k = e.target.dataset.k; if (k) { state[k] = e.target.value; drawBuilder(); } });
+document.getElementById("copyBtn").addEventListener("click", async e => {
+  const text = commands().join("\n");
+  try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied!"; }
+  catch (err) { e.target.textContent = "Copy not available here"; }
+  setTimeout(() => e.target.textContent = "Copy commands", 1600);
+});
+drawBuilder();
+})();
+</script>
+</body>
+</html>
