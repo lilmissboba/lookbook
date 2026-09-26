@@ -86,7 +86,7 @@ function mix(hex, target, amt) {
 
 /* ---------- looks ---------- */
 const SKIN = ["#FDE7D6","#F6D2B8","#EBB994","#D59D76","#B97D58","#8C5A3E"];
-const HAIR_STYLES = ["bob","long","short","buns","pigtails","ponytail","curly","messy","wavy","bald"];
+const HAIR_STYLES = ["bob","long","short","buns","pigtails","ponytail","curly","messy","wavy","bald","curtain","twoblock","quiff","spiky","buzz","manbun","sidepart"];
 const GLASSES = ["none","round","rectangle","heart"];
 const MOUTHS = ["cat","smile","grin","tongue","oh","smirk","flat","kiss"];
 function mouthSVG(m) {
@@ -128,7 +128,7 @@ function defaultLook(login) {
   const outfitKeys = Object.keys(OUTFITS);
   return {
     skin: h % SKIN.length,
-    style: (h >>> 4) % (HAIR_STYLES.length - 1),
+    style: [0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16][(h >>> 4) % 16],
     hair: HAIR_COLORS[h2 % 5 === 0 ? pick(["pink","taro","mint","blue","silver"]) : NATURAL_HAIR[(h >>> 8) % NATURAL_HAIR.length]],
     shirt: OUTFITS[outfitKeys[(h >>> 12) % outfitKeys.length]],
     pants: PANTS[(h >>> 16) % PANTS.length],
@@ -166,6 +166,19 @@ function hairParts(style, c) {
     case 8: return [`<path d="M15 48C13 22 27 19 40 19C53 19 67 22 65 48C70 55 62 61 67 68C72 75 63 81 67 88C61 93 56 88 55 80L25 80C24 88 19 93 13 88C17 81 8 75 13 68C18 61 10 55 15 48Z" fill="${c}"/>`,
       bangs + `<path d="M18 44C13 50 20 55 16 61C13 66 19 70 17 74" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M62 44C67 50 60 55 64 61C67 66 61 70 63 74" stroke="${c}" stroke-width="5" fill="none" stroke-linecap="round"/>`];
     case 9: return ["", `<path d="M27 31q7-7 16-6" stroke="#fff" stroke-opacity=".38" stroke-width="2.8" fill="none" stroke-linecap="round"/>`];
+    case 10: return [`<path d="M17 50C15 26 27 20 40 20C53 20 65 26 63 50Z" fill="${c}"/>`,
+      `<path d="M18 44C17 27 28 19 40 19C52 19 63 27 62 44C58 38 53 35 47 36C44 33 42 29 40 25C38 29 36 33 33 36C27 35 22 38 18 44Z" fill="${c}"/>` + hl];
+    case 11: return [`<path d="M17 50C16 38 18 30 22 28L58 28C62 30 64 38 63 50Z" fill="${mix(c, "#000000", .25)}"/>`,
+      `<path d="M18 42C17 26 28 18 42 18C54 18 63 25 62 40C58 34 52 31 45 31C38 31 30 33 24 38C21 40 19 42 18 42Z" fill="${c}"/><path d="M36 29C46 28 56 32 61 41C55 37 47 36 39 36Z" fill="${c}"/>` + hl];
+    case 12: return [tiedBack,
+      `<path d="M18 44C17 31 20 23 26 20C28 13 40 10 52 12C61 14 66 20 62 26C64 31 63 38 62 44C59 37 55 33 49 32C42 30 32 31 26 34C22 37 19 40 18 44Z" fill="${c}"/><path d="M30 18q10-6 24-3" stroke="#fff" stroke-opacity=".3" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M40 22q8-4 16 0" stroke="${mix(c, "#000000", .3)}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`];
+    case 13: return [tiedBack,
+      `<path d="M17 44C16 34 18 28 21 25L17 15L27 20L28 10L35 18L40 7L45 18L52 10L53 20L63 15L59 25C62 28 64 34 63 44C60 38 56 35 50 36L46 31L42 37L36 32L31 37C25 36 20 39 17 44Z" fill="${c}" stroke-linejoin="round"/>` + hl];
+    case 14: return ["", `<path d="M18 42C18 26 28 21 40 21C52 21 62 26 62 42C60 34 52 29 40 29C28 29 20 34 18 42Z" fill="${c}" opacity=".88"/>`];
+    case 15: return [`<circle cx="40" cy="17" r="7.5" fill="${c}"/><rect x="36" y="22" width="8" height="3" rx="1.5" fill="${mix(c, "#000000", .3)}"/>` + tiedBack,
+      `<path d="M18 44C17 26 28 19 40 19C52 19 63 26 62 44C60 36 56 30 50 28C44 27 36 27 30 28C24 30 20 36 18 44Z" fill="${c}"/><path d="M28 27q6-4 12-4M42 23q6 0 11 4" stroke="${mix(c, "#000000", .3)}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` + hl];
+    case 16: return [tiedBack,
+      `<path d="M17 45C16 27 28 19 41 19C54 19 64 27 63 45C61 40 58 36 54 35C47 34 39 32 30 26C26 31 20 38 17 45Z" fill="${c}"/><path d="M30 20L30 27" stroke="${mix(c, "#FFFFFF", .45)}" stroke-width="1.6" stroke-linecap="round"/><path d="M36 25q10 5 20 7" stroke="${mix(c, "#000000", .3)}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` + hl];
     case 7: return ["", short + `<path d="M41 20q-3-11 9-13q-7 5-5 13z" fill="${c}"/>`];
     default: return [bobBack, bangs];
   }
