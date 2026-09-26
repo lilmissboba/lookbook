@@ -71,7 +71,6 @@ select{font:inherit;color:var(--ink);background:var(--stage);border:1.5px solid 
   <section><header><h2>Hats</h2><code>!hat</code><span class="hint">!hat none takes it off</span></header><div class="grid" id="gHat"></div></section>
   <section><header><h2>Glasses</h2><code>!glasses</code><span class="hint">!glasses on its own toggles round glasses on and off</span></header><div class="grid" id="gGlasses"></div></section>
   <section><header><h2>Mouths</h2><code>!mouth</code><span class="hint">number or name, like !mouth grin</span></header><div class="grid" id="gMouth"></div></section>
-  <section><header><h2>Face details</h2><code>!face</code><span class="hint">like !face freckles, or !face none</span></header><div class="grid" id="gFace"></div></section>
   <section><header><h2>Extras</h2><code>!wear</code><span class="hint">like !wear scarf, or !wear none</span></header><div class="grid" id="gWear"></div></section>
   <section><header><h2>Drinks</h2><code>!drink</code><span class="hint">!drink on its own picks a random different one</span></header><div class="grid show-cup" id="gDrink"></div></section>
   <section><header><h2>Surprise me</h2><code>!random</code><span class="hint">a whole new random look, a few examples below</span></header><div class="grid" id="gRandom"></div></section>
@@ -117,7 +116,6 @@ const OUTFITS = { taro:"#9C7BB5", matcha:"#8DAA6A", strawberry:"#E8A0A8", mango:
   red:"#C4515C", yellow:"#F2D36B", pink:"#F4B6C8", white:"#F7F2EA" };
 const PANTS = ["#4A3A55","#3E4A5C","#5B4636","#2F3A33","#6B5A4A"];
 const HATS = ["none","beanie","bow","cat","bunny","frog","flower","headphones","crown","bear","fox","puppy","panda","boba","strawberry","beret","bucket","cap","sunhat","chef","flowercrown","halo","starclips","headband","tiara","santa","witch","party"];
-const FACES = ["none","freckles","mole","hearts","bandage"];
 const WEARS = ["none","scarf","backpack","handbag","wings"];
 
 const NAME_COLORS = ["#F2A2B0","#B89BD1","#9DBB74","#EDA35A","#8FC1D4","#F4D06F","#E58F7C","#C3A5E8"];
@@ -152,14 +150,14 @@ function defaultLook(login) {
     pants: PANTS[(h >>> 16) % PANTS.length],
     hat: h2 % 4 === 0 ? HATS[1 + (h2 >>> 3) % (HATS.length - 1)] : "none",
     glasses: (h2 >>> 7) % 7 === 0 ? "round" : "none",
-    mouth: "cat", face: "none", wear: "none"
+    mouth: "cat", wear: "none"
   };
 }
 function randomLook() {
   const o = Object.values(OUTFITS), hc = Object.values(HAIR_COLORS);
   return { skin: Math.floor(Math.random() * SKIN.length), style: Math.floor(Math.random() * HAIR_STYLES.length),
     hair: pick(hc), shirt: pick(o), pants: pick(PANTS), hat: Math.random() < .55 ? pick(HATS.slice(1)) : "none", glasses: Math.random() < .3 ? pick(GLASSES.slice(1)) : "none", mouth: pick(MOUTHS),
-    face: Math.random() < .35 ? pick(FACES.slice(1)) : "none", wear: Math.random() < .35 ? pick(WEARS.slice(1)) : "none" };
+    wear: Math.random() < .35 ? pick(WEARS.slice(1)) : "none" };
 }
 
 function hairParts(style, c) {
@@ -261,16 +259,6 @@ function hatSVG(hat, hairC, acc) {
     default: return "";
   }
 }
-function faceSVG(f) {
-  const sh = (x, y, r) => `M${x} ${y + r * .9}C${x - r * 1.25} ${y + r * .05} ${x - r * .95} ${y - r * .95} ${x} ${y - r * .35}C${x + r * .95} ${y - r * .95} ${x + r * 1.25} ${y + r * .05} ${x} ${y + r * .9}Z`;
-  switch (f) {
-    case "freckles": return `<g fill="#C98A6B" opacity=".75"><circle cx="25" cy="54.5" r=".9"/><circle cx="28" cy="56.8" r=".9"/><circle cx="24.5" cy="57.8" r=".8"/><circle cx="55" cy="54.5" r=".9"/><circle cx="52" cy="56.8" r=".9"/><circle cx="55.5" cy="57.8" r=".8"/></g>`;
-    case "mole": return `<circle cx="51.5" cy="59.5" r="1" fill="#3A2419"/>`;
-    case "hearts": return `<path d="${sh(26.5, 56, 2.8)}" fill="#F5AAC0"/><path d="${sh(53.5, 56, 2.8)}" fill="#F5AAC0"/>`;
-    case "bandage": return `<g transform="rotate(-20 52 55)"><rect x="46" y="52.5" width="12" height="5" rx="2.5" fill="#F9D9B8" stroke="#E8C29A" stroke-width=".6"/><circle cx="51" cy="55" r=".5" fill="#E8C29A"/><circle cx="53" cy="55" r=".5" fill="#E8C29A"/></g>`;
-    default: return "";
-  }
-}
 function wearBack(w) {
   if (w === "wings") return `<g opacity=".88"><ellipse cx="22" cy="74" rx="11" ry="16" fill="#E3F0FA" stroke="#BAD5FF" stroke-width="1" transform="rotate(-25 22 74)"/><ellipse cx="58" cy="74" rx="11" ry="16" fill="#E3F0FA" stroke="#BAD5FF" stroke-width="1" transform="rotate(25 58 74)"/><ellipse cx="25" cy="90" rx="7" ry="9" fill="#F7E3EE" transform="rotate(-30 25 90)"/><ellipse cx="55" cy="90" rx="7" ry="9" fill="#F7E3EE" transform="rotate(30 55 90)"/></g>`;
   if (w === "backpack") return `<rect x="23" y="71" width="34" height="25" rx="7" fill="#F8C0D1"/><rect x="25" y="86" width="8" height="8" rx="2" fill="#F5AAC0"/>`;
@@ -314,7 +302,6 @@ function spriteSVG(k) {
       <circle cx="32.7" cy="48.7" r="1.35" fill="#fff"/><circle cx="49.7" cy="48.7" r="1.35" fill="#fff"/>
       <circle cx="30.5" cy="52.3" r=".6" fill="#fff"/><circle cx="47.5" cy="52.3" r=".6" fill="#fff"/></g>
     <g class="eyesClosed" stroke="#2E1D15" stroke-width="1.7" fill="none" stroke-linecap="round"><path d="M28 50.5q3.5 3 7 0"/><path d="M45 50.5q3.5 3 7 0"/></g>
-    ${faceSVG(k.face)}
     ${mouthSVG(k.mouth)}
     ${front}${glasses}${hatSVG(k.hat, k.hair, k.shirt)}
     <g class="apron"><path d="M31 81h18l2.5 17h-23z" fill="#FFF8F1"/><rect x="33.5" y="74" width="13" height="8" rx="1.5" fill="#FFF8F1"/><path d="M34 74l-3.5-5.5M46 74l3.5-5.5" stroke="#FFF8F1" stroke-width="1.5" stroke-linecap="round"/><rect x="36" y="86" width="8" height="5" rx="1.2" fill="#F7C6D4"/><path d="M40 77.5c-1.2-1.3-3-.2-2.3 1.2l2.3 2 2.3-2c.7-1.4-1.1-2.5-2.3-1.2z" fill="#E26A87"/></g>
@@ -333,7 +320,7 @@ function spriteSVG(k) {
 }
 
 const DRINK_LIST = DRINKS;
-const BASE = { skin: 1, style: 0, hair: HAIR_COLORS.brown, shirt: OUTFITS.strawberry, pants: PANTS[0], hat: "none", glasses: "none", mouth: "cat", face: "none", wear: "none" };
+const BASE = { skin: 1, style: 0, hair: HAIR_COLORS.brown, shirt: OUTFITS.strawberry, pants: PANTS[0], hat: "none", glasses: "none", mouth: "cat", wear: "none" };
 const card = (look, title, sub, drink) =>
   `<div class="item" style="--drink:${(drink && drink.color) || "#B89BD1"};--drink2:${(drink && (drink.color2 || drink.color)) || "#B89BD1"}">${spriteSVG(Object.assign({}, BASE, look))}<b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>`;
 const fill = (id, html) => document.getElementById(id).innerHTML = html;
@@ -343,7 +330,6 @@ fill("gHairColor", Object.entries(HAIR_COLORS).map(([n, c]) => card({ hair: c, s
 fill("gSkin", SKIN.map((c, i) => card({ skin: i, style: 2 }, `<i class="sw" style="background:${c}"></i>${i + 1}`, `!skin ${i + 1}`)).join(""));
 fill("gOutfit", Object.entries(OUTFITS).map(([n, c]) => card({ shirt: c }, `<i class="sw" style="background:${c}"></i>${n}`, `!outfit ${n}`)).join(""));
 fill("gHat", HATS.map(h => card({ hat: h, style: ["cat", "bunny", "bear", "fox", "panda", "puppy", "halo", "party", "witch", "chef", "boba"].includes(h) ? 2 : 0 }, h, `!hat ${h}`)).join(""));
-fill("gFace", FACES.map(f => card({ face: f, style: 2 }, f === "none" ? "none" : f, `!face ${f}`)).join(""));
 fill("gWear", WEARS.map(w => card({ wear: w }, w, `!wear ${w}`)).join(""));
 
 fill("gGlasses", GLASSES.map(g => card({ glasses: g }, g === "none" ? "off" : g, `!glasses ${g === "none" ? "off" : g}`)).join(""));
@@ -354,10 +340,10 @@ const seeded = seed => { let x = seed; return () => (x = (x * 16807) % 214748364
 const r = seeded(7);
 const pickR = a => a[Math.floor(r() * a.length)];
 fill("gRandom", [...Array(6)].map(() => card({ skin: Math.floor(r() * SKIN.length), style: Math.floor(r() * HAIR_STYLES.length), hair: pickR(Object.values(HAIR_COLORS)),
-  shirt: pickR(Object.values(OUTFITS)), pants: pickR(PANTS), hat: r() < .6 ? pickR(HATS.slice(1)) : "none", glasses: r() < .35 ? pickR(GLASSES.slice(1)) : "none", mouth: pickR(MOUTHS), face: r() < .4 ? pickR(FACES.slice(1)) : "none", wear: r() < .4 ? pickR(WEARS.slice(1)) : "none" }, "random", "!random")).join(""));
+  shirt: pickR(Object.values(OUTFITS)), pants: pickR(PANTS), hat: r() < .6 ? pickR(HATS.slice(1)) : "none", glasses: r() < .35 ? pickR(GLASSES.slice(1)) : "none", mouth: pickR(MOUTHS), wear: r() < .4 ? pickR(WEARS.slice(1)) : "none" }, "random", "!random")).join(""));
 
 /* builder */
-const state = { style: 0, hair: "brown", skin: 2, outfit: "strawberry", hat: "none", glasses: "off", mouth: "cat", face: "none", wear: "none", drink: 1 };
+const state = { style: 0, hair: "brown", skin: 2, outfit: "strawberry", hat: "none", glasses: "off", mouth: "cat", wear: "none", drink: 1 };
 const fields = [
   ["style", "Hairstyle", HAIR_STYLES.map((n, i) => [i, `${i + 1}. ${n}`])],
   ["hair", "Hair color", Object.keys(HAIR_COLORS).map(n => [n, n])],
@@ -366,7 +352,6 @@ const fields = [
   ["hat", "Hat", HATS.map(h => [h, h])],
   ["glasses", "Glasses", GLASSES.map(g => [g === "none" ? "off" : g, g === "none" ? "off" : g])],
   ["mouth", "Mouth", MOUTHS.map((m, i) => [m, `${i + 1}. ${m}`])],
-  ["face", "Face details", FACES.map(f => [f, f])],
   ["wear", "Extras", WEARS.map(w => [w, w])],
   ["drink", "Drink", DRINK_LIST.map((d, i) => [i, d.name])]
 ];
@@ -375,13 +360,13 @@ controls.innerHTML = fields.map(([k, label, opts]) =>
   `<label>${label}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}"${String(v) === String(state[k]) ? " selected" : ""}>${t}</option>`).join("")}</select></label>`).join("");
 function commands() {
   return [`!hair ${Number(state.style) + 1}`, `!haircolor ${state.hair}`, `!skin ${state.skin}`, `!outfit ${state.outfit}`,
-    `!hat ${state.hat}`, `!glasses ${state.glasses}`, `!mouth ${state.mouth}`, `!face ${state.face}`, `!wear ${state.wear}`, `!drink ${DRINK_LIST[state.drink].cmd}`];
+    `!hat ${state.hat}`, `!glasses ${state.glasses}`, `!mouth ${state.mouth}`, `!wear ${state.wear}`, `!drink ${DRINK_LIST[state.drink].cmd}`];
 }
 function drawBuilder() {
   const d = DRINK_LIST[state.drink];
   setDrinkVars(document.getElementById("builderPreview"), d);
   document.getElementById("builderPreview").innerHTML = spriteSVG({ skin: Number(state.skin) - 1, style: Number(state.style), hair: HAIR_COLORS[state.hair],
-    shirt: OUTFITS[state.outfit], pants: PANTS[0], hat: state.hat, glasses: state.glasses === "off" ? "none" : state.glasses, mouth: state.mouth, face: state.face, wear: state.wear });
+    shirt: OUTFITS[state.outfit], pants: PANTS[0], hat: state.hat, glasses: state.glasses === "off" ? "none" : state.glasses, mouth: state.mouth, wear: state.wear });
   document.getElementById("cmds").innerHTML = commands().map(c => `<code>${c}</code>`).join("");
 }
 controls.addEventListener("change", e => { const k = e.target.dataset.k; if (k) { state[k] = e.target.value; drawBuilder(); } });
