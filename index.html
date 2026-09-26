@@ -29,7 +29,10 @@ code{font-family:inherit;font-weight:600;background:var(--chip);color:var(--chip
 .item b{display:block;font-weight:600;font-size:.95rem;margin-top:2px}
 .item span{display:block;color:var(--muted);font-size:.8rem}
 .sw{width:14px;height:14px;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.15)}
-.sprite .sitlegs,.sprite .laptop,.sprite .eyesClosed,.sprite .cup{display:none}
+.sprite .sitlegs,.sprite .laptop,.sprite .eyesClosed,.sprite .cup,.sprite .apron{display:none}
+.item svg{overflow:visible}
+.haloglow{animation:haloglow 2.2s ease-in-out infinite}
+@keyframes haloglow{0%,100%{opacity:.25}50%{opacity:.85}}
 .show-cup .sprite .cup{display:inline}
 /* builder */
 .builder{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:18px;align-items:start}
@@ -68,6 +71,8 @@ select{font:inherit;color:var(--ink);background:var(--stage);border:1.5px solid 
   <section><header><h2>Hats</h2><code>!hat</code><span class="hint">!hat none takes it off</span></header><div class="grid" id="gHat"></div></section>
   <section><header><h2>Glasses</h2><code>!glasses</code><span class="hint">!glasses on its own toggles round glasses on and off</span></header><div class="grid" id="gGlasses"></div></section>
   <section><header><h2>Mouths</h2><code>!mouth</code><span class="hint">number or name, like !mouth grin</span></header><div class="grid" id="gMouth"></div></section>
+  <section><header><h2>Face details</h2><code>!face</code><span class="hint">like !face freckles, or !face none</span></header><div class="grid" id="gFace"></div></section>
+  <section><header><h2>Extras</h2><code>!wear</code><span class="hint">like !wear scarf, or !wear none</span></header><div class="grid" id="gWear"></div></section>
   <section><header><h2>Drinks</h2><code>!drink</code><span class="hint">!drink on its own picks a random different one</span></header><div class="grid show-cup" id="gDrink"></div></section>
   <section><header><h2>Surprise me</h2><code>!random</code><span class="hint">a whole new random look, a few examples below</span></header><div class="grid" id="gRandom"></div></section>
 </main>
@@ -111,14 +116,27 @@ const OUTFITS = { taro:"#9C7BB5", matcha:"#8DAA6A", strawberry:"#E8A0A8", mango:
   cream:"#F2E3C9", sage:"#6F8F7A", peach:"#F0B495", lavender:"#C3A5E8", mint:"#9ED6C0", navy:"#3E4A7A", black:"#3A3440",
   red:"#C4515C", yellow:"#F2D36B", pink:"#F4B6C8", white:"#F7F2EA" };
 const PANTS = ["#4A3A55","#3E4A5C","#5B4636","#2F3A33","#6B5A4A"];
-const HATS = ["none","beanie","bow","cat","bunny","frog","flower","headphones","crown"];
+const HATS = ["none","beanie","bow","cat","bunny","frog","flower","headphones","crown","bear","fox","puppy","panda","boba","strawberry","beret","bucket","cap","sunhat","chef","flowercrown","halo","starclips","headband","tiara","santa","witch","party"];
+const FACES = ["none","freckles","mole","hearts","bandage"];
+const WEARS = ["none","scarf","backpack","handbag","wings"];
+
 const NAME_COLORS = ["#F2A2B0","#B89BD1","#9DBB74","#EDA35A","#8FC1D4","#F4D06F","#E58F7C","#C3A5E8"];
 const DRINKS = [
-  { name: "brown sugar pearl", color: "#C08A5B" }, { name: "taro cloud", color: "#B89BD1" },
-  { name: "matcha latte", color: "#9DBB74" }, { name: "strawberry oolong", color: "#F2A2B0" },
-  { name: "thai milk tea", color: "#EDA35A" }, { name: "lychee green", color: "#F6DC7A" },
-  { name: "honeydew", color: "#B8DDA8" }, { name: "black sesame", color: "#8C8378" }
+  { name: "brown sugar pearl", cmd: "brown", color: "#9A6440", color2: "#EBD5B8" }, { name: "taro cloud", cmd: "taro", color: "#B89BD1" },
+  { name: "matcha latte", cmd: "matcha", color: "#F3EBD8", color2: "#9DBB74" }, { name: "strawberry oolong", cmd: "strawberry", color: "#F2A2B0" },
+  { name: "thai milk tea", cmd: "thai", color: "#EDA35A", color2: "#F6E3CC" }, { name: "lychee green", cmd: "lychee", color: "#F6DC7A" },
+  { name: "honeydew", cmd: "honeydew", color: "#B8DDA8" }, { name: "black sesame", cmd: "sesame", color: "#8C8378" },
+  { name: "classic milk tea", cmd: "classic", color: "#D2A77C" }, { name: "rose milk tea", cmd: "rose", color: "#F4B6C8" },
+  { name: "lavender milk tea", cmd: "lavender", color: "#CDB8E8" }, { name: "earl grey milk tea", cmd: "earl", color: "#D8C0A4" },
+  { name: "hokkaido milk tea", cmd: "hokkaido", color: "#C98E5A", color2: "#E8C9A0" }, { name: "coconut milk tea", cmd: "coconut", color: "#F5EFE6" },
+  { name: "coffee milk tea", cmd: "coffee", color: "#A67B5B" }, { name: "mango green tea", cmd: "mango", color: "#F9C24A", color2: "#FFE7A0" },
+  { name: "passion fruit green tea", cmd: "passion", color: "#F2C94C", color2: "#FBE38A" }, { name: "peach oolong", cmd: "peach", color: "#F7A88A", color2: "#FCD9B8" },
+  { name: "watermelon slush", cmd: "watermelon", color: "#F58E97", color2: "#FFC2C7" }, { name: "blueberry tea", cmd: "blueberry", color: "#9DA8E0", color2: "#C9CFF2" },
+  { name: "yakult green tea", cmd: "yakult", color: "#E3EAB0" }, { name: "strawberry matcha latte", cmd: "strawberry matcha", color: "#F7B0C0", color2: "#A9CC8A" },
+  { name: "cheese foam oolong", cmd: "cheese", color: "#D9A15A", color2: "#FFF6E8" }, { name: "winter melon tea", cmd: "winter", color: "#C79A5A" },
+  { name: "chocolate milk tea", cmd: "chocolate", color: "#7A4E36", color2: "#B58563" }, { name: "ube latte", cmd: "ube", color: "#8E6BB8", color2: "#EDE2F7" }
 ];
+function setDrinkVars(el, d) { el.style.setProperty("--drink", d.color); el.style.setProperty("--drink2", d.color2 || d.color); }
 const nameColor = (login, c) => validHex(c) ? mix(c, "#FFFFFF", .35) : NAME_COLORS[hash(login) % NAME_COLORS.length];
 const nameInk = (login, c) => mix(validHex(c) ? c : NAME_COLORS[hash(login) % NAME_COLORS.length], "#3A2419", .45);
 const colorFrom = (arg, table) => { const a = (arg || "").toLowerCase().replace(/\s+/g, ""); return table[a] || (validHex(a) ? a : null); };
@@ -134,13 +152,14 @@ function defaultLook(login) {
     pants: PANTS[(h >>> 16) % PANTS.length],
     hat: h2 % 4 === 0 ? HATS[1 + (h2 >>> 3) % (HATS.length - 1)] : "none",
     glasses: (h2 >>> 7) % 7 === 0 ? "round" : "none",
-    mouth: "cat"
+    mouth: "cat", face: "none", wear: "none"
   };
 }
 function randomLook() {
   const o = Object.values(OUTFITS), hc = Object.values(HAIR_COLORS);
   return { skin: Math.floor(Math.random() * SKIN.length), style: Math.floor(Math.random() * HAIR_STYLES.length),
-    hair: pick(hc), shirt: pick(o), pants: pick(PANTS), hat: Math.random() < .55 ? pick(HATS.slice(1)) : "none", glasses: Math.random() < .3 ? pick(GLASSES.slice(1)) : "none", mouth: pick(MOUTHS) };
+    hair: pick(hc), shirt: pick(o), pants: pick(PANTS), hat: Math.random() < .55 ? pick(HATS.slice(1)) : "none", glasses: Math.random() < .3 ? pick(GLASSES.slice(1)) : "none", mouth: pick(MOUTHS),
+    face: Math.random() < .35 ? pick(FACES.slice(1)) : "none", wear: Math.random() < .35 ? pick(WEARS.slice(1)) : "none" };
 }
 
 function hairParts(style, c) {
@@ -183,6 +202,15 @@ function hairParts(style, c) {
     default: return [bobBack, bangs];
   }
 }
+function hatBack(hat) {
+  if (hat === "bear") return `<circle cx="20" cy="27" r="8.5" fill="#A87450"/><circle cx="60" cy="27" r="8.5" fill="#A87450"/><circle cx="20" cy="26" r="4.5" fill="#E8C29A"/><circle cx="60" cy="26" r="4.5" fill="#E8C29A"/>`;
+  if (hat === "fox") {
+    const ear = (x, y, r) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(1.25)"><path d="M-7.5 2C-6.5-6-3.5-12.5 0-13.5C3.5-12.5 6.5-6 7.5 2Q0-1.5-7.5 2Z" fill="#F7A86A"/><path d="M-3.8-.5C-3.3-5.5-1.7-9.2 0-9.8C1.7-9.2 3.3-5.5 3.8-.5Q0-2-3.8-.5Z" fill="#FFF2E6"/></g>`;
+    return ear(24, 27, -28) + ear(56, 27, 28);
+  }
+  if (hat === "panda") return `<circle cx="20" cy="27" r="8.5" fill="#2E2A2E"/><circle cx="60" cy="27" r="8.5" fill="#2E2A2E"/><circle cx="20" cy="26" r="4" fill="#5A5560"/><circle cx="60" cy="26" r="4" fill="#5A5560"/>`;
+  return "";
+}
 function hatSVG(hat, hairC, acc) {
   const dark = mix(acc, "#3A2419", .3), light = mix(acc, "#FFFFFF", .45);
   switch (hat) {
@@ -201,10 +229,60 @@ function hatSVG(hat, hairC, acc) {
     case "frog": return `<path d="M16 37C16 20 28 16 40 16C52 16 64 20 64 37Z" fill="#8DC47A"/><circle cx="29" cy="16" r="7" fill="#8DC47A"/><circle cx="51" cy="16" r="7" fill="#8DC47A"/><circle cx="29" cy="16" r="4" fill="#fff"/><circle cx="51" cy="16" r="4" fill="#fff"/><circle cx="29.6" cy="16.6" r="2.1" fill="#2E1D15"/><circle cx="51.6" cy="16.6" r="2.1" fill="#2E1D15"/><path d="M33 30q7 4 14 0" stroke="#5E8F4E" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
     case "flower": { let p = ""; for (let i = 0; i < 5; i++) { const a = i * 72 * Math.PI / 180; p += `<circle cx="${(56 + Math.cos(a) * 4.4).toFixed(1)}" cy="${(27 + Math.sin(a) * 4.4).toFixed(1)}" r="3.8" fill="#FFF1F4"/>`; } return p + `<circle cx="56" cy="27" r="2.8" fill="#F2C94C"/>`; }
     case "headphones": return `<path d="M15 47C15 22 26 14 40 14C54 14 65 22 65 47" stroke="${acc}" stroke-width="4.5" fill="none"/><rect x="10" y="40" width="10" height="17" rx="5" fill="${acc}"/><rect x="60" y="40" width="10" height="17" rx="5" fill="${acc}"/><rect x="12" y="44" width="6" height="9" rx="3" fill="${light}"/><rect x="62" y="44" width="6" height="9" rx="3" fill="${light}"/>`;
+    case "bear": return "";
+    case "fox": return "";
+    case "puppy": return `<ellipse cx="16" cy="43" rx="6.5" ry="13" fill="#C99A6B" transform="rotate(18 16 43)"/><ellipse cx="64" cy="43" rx="6.5" ry="13" fill="#C99A6B" transform="rotate(-18 64 43)"/>`;
+    case "panda": return "";
+    case "boba": return `<g transform="translate(40 4)"><path d="M-10 4h20l-2 18h-16z" fill="#C08A5B" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/><path d="M-10 4h20l-.8 7h-18.4z" fill="#EBD5B8"/><rect x="-11" y="1.5" width="22" height="4" rx="2" fill="#F7EFE6"/><rect x="3" y="-10" width="3" height="13" fill="#F28DAA" transform="rotate(14 4.5 -3)"/><circle cx="-4" cy="18" r="2" fill="#3A2419"/><circle cx="1" cy="19" r="2" fill="#3A2419"/><circle cx="5" cy="17" r="2" fill="#3A2419"/></g>`;
+    case "strawberry": return `<path d="M16 38C16 20 28 14 40 14C52 14 64 20 64 38Q40 44 16 38Z" fill="#F7A1AE"/><g fill="#FFF1C8">${[[26,26],[34,21],[46,21],[54,26],[30,33],[40,29],[50,33],[22,34],[58,34]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.1" ry="1.6"/>`).join("")}</g><path d="M40 17l-9-4h6l-3-6 6 4v-6l3 6 4-4-2 6h6l-8 4z" fill="#8DC47A"/><path d="M40 10v-5" stroke="#6FA35C" stroke-width="1.6" stroke-linecap="round"/>`;
+    case "beret": return `<path d="M15 27C14 17 28 12 42 12.5C57 13 67 19 64.5 27C56 31.5 24 31.5 15 27Z" fill="${acc}"/><path d="M19 27.5C30 30.5 51 30.5 61 27.5" stroke="${dark}" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M41 12.5v-4.5" stroke="${dark}" stroke-width="2.4" stroke-linecap="round"/>`;
+    case "bucket": return `<path d="M20 32L23 17Q40 11 57 17L60 32Z" fill="${acc}"/><ellipse cx="40" cy="32" rx="27" ry="5.5" fill="${dark}"/><path d="M22 27h36" stroke="${light}" stroke-width="2"/>`;
+    case "cap": return `<path d="M17 35C17 20 28 15 40 15C52 15 63 20 63 35Z" fill="${acc}"/><path d="M40 33Q58 29 72 36Q58 40 40 37Z" fill="${dark}"/><circle cx="40" cy="15.5" r="2.4" fill="${dark}"/>`;
+    case "sunhat": return `<path d="M18 27C18 9 62 9 62 27Z" fill="#F6E5BF"/><ellipse cx="40" cy="27" rx="33" ry="7" fill="#F2DDB0"/><path d="M18 27C18 9 62 9 62 27Q40 31 18 27Z" fill="#F6E5BF"/><rect x="19" y="20" width="42" height="5" rx="2" fill="#F8C0D1"/><circle cx="57" cy="22.5" r="3.2" fill="#F5AAC0"/>`;
+    case "chef": return `<g fill="#FFFFFF" stroke="#E4DDD3" stroke-width="1"><circle cx="24" cy="14" r="10"/><circle cx="56" cy="14" r="10"/><circle cx="32" cy="7" r="10"/><circle cx="48" cy="7" r="10"/><circle cx="40" cy="4" r="10.5"/><path d="M15 34V18h50v16Q40 38 15 34Z"/></g><path d="M16 29Q40 33 64 29" stroke="#E4DDD3" stroke-width="1" fill="none"/>`;
+    case "flowercrown": {
+      let f = ""; const cols = ["#F8C0D1", "#FFE3AA", "#D2C0F2", "#FFFFFF", "#BAD5FF", "#F5AAC0", "#C4E7CC"];
+      for (let i = 0; i < 7; i++) {
+        const a = (200 + i * 23) * Math.PI / 180, x = 40 + Math.cos(a) * 22, y = 40 + Math.sin(a) * 22;
+        if (i % 2) f += `<ellipse cx="${(x + 3).toFixed(1)}" cy="${(y + 2).toFixed(1)}" rx="2.6" ry="1.4" fill="#9CC78E" transform="rotate(30 ${(x + 3).toFixed(1)} ${(y + 2).toFixed(1)})"/>`;
+        for (let k = 0; k < 5; k++) { const b = k * 72 * Math.PI / 180; f += `<circle cx="${(x + Math.cos(b) * 2.6).toFixed(1)}" cy="${(y + Math.sin(b) * 2.6).toFixed(1)}" r="2.2" fill="${cols[i]}"/>`; }
+        f += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#F2C94C"/>`;
+      }
+      return f;
+    }
+    case "halo": return `<ellipse class="haloglow" cx="40" cy="10" rx="17" ry="6" fill="none" stroke="#FFF1A8" stroke-width="7" opacity=".45"/><ellipse cx="40" cy="10" rx="15" ry="4.5" fill="none" stroke="#FFE07A" stroke-width="3.2"/><ellipse cx="40" cy="10" rx="15" ry="4.5" fill="none" stroke="#FFFBE0" stroke-width="1.2"/>`;
+    case "starclips": { const st = (x, y, r) => `<path d="M${x} ${y - r}l${r * .3} ${r * .62} ${r * .68} ${r * .1}-${r * .5} ${r * .48} ${r * .12} ${r * .68}-${r * .6}-${r * .32}-${r * .6} ${r * .32} ${r * .12}-${r * .68}-${r * .5}-${r * .48} ${r * .68}-${r * .1}z" fill="#FFE07A" stroke="#F2C94C" stroke-width=".6"/>`; return st(55, 32, 5) + st(47, 26, 4); }
+    case "headband": return `<path d="M16.5 41C15 16 65 16 63.5 41C61 22 19 22 16.5 41Z" fill="${acc}"/><path d="M24 26C30 20.5 50 20.5 56 26" stroke="${light}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+    case "tiara": return `<path d="M26 26L29 17L34 22L40 13L46 22L51 17L54 26Z" fill="#EEE9F7" stroke="#C9C2DC" stroke-width="1" stroke-linejoin="round"/><circle cx="40" cy="18.5" r="2.2" fill="#F5AAC0"/><circle cx="31" cy="21.5" r="1.4" fill="#BAD5FF"/><circle cx="49" cy="21.5" r="1.4" fill="#BAD5FF"/>`;
+    case "santa": return `<path d="M17 36C17 20 28 14 40 14C51 14 58 19 62 26L71 33L63 32C63 34 63 35 63 36Z" fill="#F4A6A3"/><rect x="15" y="33" width="50" height="8" rx="4" fill="#FFFFFF"/><circle cx="71" cy="34" r="4.6" fill="#FFFFFF"/>`;
+    case "witch": return `<ellipse cx="40" cy="26" rx="31" ry="6" fill="#B19ADB"/><path d="M17 26Q22 20 29 14Q37 4 45 -9Q48 6 53 14Q59 20 63 26Q40 30 17 26Z" fill="#C9B0EC"/><path d="M19 23Q40 27 61 23L62 26Q40 30 18 26Z" fill="#F9C08E"/>`;
+    case "party": return `<path d="M29 24L40 -4L51 24Z" fill="#BAD5FF"/><path d="M34 12l10 2.5M31.5 18l17 3.5M37 5l6 1.5" stroke="#F8C0D1" stroke-width="2.4" stroke-linecap="round"/><circle cx="40" cy="-5" r="3.5" fill="#FFE3AA"/>`;
     case "crown": return `<path d="M29 23L29 11L34.5 17L40 8L45.5 17L51 11L51 23Z" fill="#F2C94C" stroke="#D9A93A" stroke-width="1"/><circle cx="40" cy="16" r="1.8" fill="#E8A0A8"/>`;
     default: return "";
   }
 }
+function faceSVG(f) {
+  const sh = (x, y, r) => `M${x} ${y + r * .9}C${x - r * 1.25} ${y + r * .05} ${x - r * .95} ${y - r * .95} ${x} ${y - r * .35}C${x + r * .95} ${y - r * .95} ${x + r * 1.25} ${y + r * .05} ${x} ${y + r * .9}Z`;
+  switch (f) {
+    case "freckles": return `<g fill="#C98A6B" opacity=".75"><circle cx="25" cy="54.5" r=".9"/><circle cx="28" cy="56.8" r=".9"/><circle cx="24.5" cy="57.8" r=".8"/><circle cx="55" cy="54.5" r=".9"/><circle cx="52" cy="56.8" r=".9"/><circle cx="55.5" cy="57.8" r=".8"/></g>`;
+    case "mole": return `<circle cx="51.5" cy="59.5" r="1" fill="#3A2419"/>`;
+    case "hearts": return `<path d="${sh(26.5, 56, 2.8)}" fill="#F5AAC0"/><path d="${sh(53.5, 56, 2.8)}" fill="#F5AAC0"/>`;
+    case "bandage": return `<g transform="rotate(-20 52 55)"><rect x="46" y="52.5" width="12" height="5" rx="2.5" fill="#F9D9B8" stroke="#E8C29A" stroke-width=".6"/><circle cx="51" cy="55" r=".5" fill="#E8C29A"/><circle cx="53" cy="55" r=".5" fill="#E8C29A"/></g>`;
+    default: return "";
+  }
+}
+function wearBack(w) {
+  if (w === "wings") return `<g opacity=".88"><ellipse cx="22" cy="74" rx="11" ry="16" fill="#E3F0FA" stroke="#BAD5FF" stroke-width="1" transform="rotate(-25 22 74)"/><ellipse cx="58" cy="74" rx="11" ry="16" fill="#E3F0FA" stroke="#BAD5FF" stroke-width="1" transform="rotate(25 58 74)"/><ellipse cx="25" cy="90" rx="7" ry="9" fill="#F7E3EE" transform="rotate(-30 25 90)"/><ellipse cx="55" cy="90" rx="7" ry="9" fill="#F7E3EE" transform="rotate(30 55 90)"/></g>`;
+  if (w === "backpack") return `<rect x="23" y="71" width="34" height="25" rx="7" fill="#F8C0D1"/><rect x="25" y="86" width="8" height="8" rx="2" fill="#F5AAC0"/>`;
+  return "";
+}
+function wearFront(w) {
+  if (w === "backpack") return `<path d="M33.5 71v17M46.5 71v17" stroke="#E890AB" stroke-width="2.4" stroke-linecap="round"/>`;
+  if (w === "handbag") return `<path d="M21 93q3.5-7 7 0" stroke="#E890AB" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M17.5 93h14l1.4 10.5h-16.8z" fill="#F5AAC0"/><path d="M17.5 93h14l.3 2.4h-14.6z" fill="#E890AB"/><rect x="23.2" y="94.4" width="3" height="2.2" rx=".6" fill="#F7DE93"/>`;
+  if (w === "scarf") return `<path d="M29 67q11 7 22 0v5q-11 7-22 0z" fill="#F5AAC0"/><path d="M45 71l3 12-4 1-3-11z" fill="#E890AB"/><path d="M31 69.5q9 5 18 0" stroke="#FBD3DF" stroke-width="1" fill="none"/>`;
+  return "";
+}
+
 function spriteSVG(k) {
   const skin = SKIN[k.skin] || SKIN[0];
   const [back, front] = hairParts(k.style, k.hair);
@@ -217,26 +295,32 @@ function spriteSVG(k) {
     : "";
   return `<svg class="sprite" viewBox="0 0 80 120" xmlns="http://www.w3.org/2000/svg">
     <ellipse class="shadow" cx="40" cy="115" rx="16" ry="4" fill="rgba(35,18,10,.3)"/>
+    ${wearBack(k.wear) && k.wear === "wings" ? wearBack("wings") : ""}
     <g class="legs">
       <g class="legL"><rect x="33.5" y="94" width="6.5" height="16" rx="3.2" fill="${k.pants}"/><ellipse cx="36.5" cy="111.5" rx="5" ry="3.2" fill="${shoe}"/></g>
       <g class="legR"><rect x="40" y="94" width="6.5" height="16" rx="3.2" fill="${k.pants}"/><ellipse cx="43.5" cy="111.5" rx="5" ry="3.2" fill="${shoe}"/></g>
     </g>
     <g class="sitlegs"><rect x="37" y="91" width="18" height="7.5" rx="3.7" fill="${k.pants}"/><rect x="49" y="93" width="6.5" height="9" rx="3.2" fill="${k.pants}"/><ellipse cx="53.5" cy="103" rx="4.8" ry="3" fill="${shoe}"/></g>
-    ${back}
+    ${hatBack(k.hat)}${back}
+    ${k.wear === "backpack" ? wearBack("backpack") : ""}
     <path d="M28 98C27 83 31 71 40 70C49 71 53 83 52 98Z" fill="${k.shirt}"/>
     <ellipse cx="29" cy="84" rx="4" ry="8.5" fill="${k.shirt}" transform="rotate(16 29 84)"/>
     <ellipse cx="51" cy="84" rx="4" ry="8.5" fill="${k.shirt}" transform="rotate(-16 51 84)"/>
     <circle cx="27" cy="91" r="3.4" fill="${skin}"/><circle cx="53" cy="91" r="3.4" fill="${skin}"/>
+    ${wearFront(k.wear)}
     <circle cx="40" cy="46" r="23" fill="${skin}"/>
     <ellipse cx="28" cy="56.5" rx="4.2" ry="2.5" fill="#F59A9A" opacity=".55"/><ellipse cx="52" cy="56.5" rx="4.2" ry="2.5" fill="#F59A9A" opacity=".55"/>
     <g class="eyesOpen"><ellipse cx="31.5" cy="50.5" rx="3.3" ry="4.3" fill="#2E1D15"/><ellipse cx="48.5" cy="50.5" rx="3.3" ry="4.3" fill="#2E1D15"/>
       <circle cx="32.7" cy="48.7" r="1.35" fill="#fff"/><circle cx="49.7" cy="48.7" r="1.35" fill="#fff"/>
       <circle cx="30.5" cy="52.3" r=".6" fill="#fff"/><circle cx="47.5" cy="52.3" r=".6" fill="#fff"/></g>
     <g class="eyesClosed" stroke="#2E1D15" stroke-width="1.7" fill="none" stroke-linecap="round"><path d="M28 50.5q3.5 3 7 0"/><path d="M45 50.5q3.5 3 7 0"/></g>
+    ${faceSVG(k.face)}
     ${mouthSVG(k.mouth)}
     ${front}${glasses}${hatSVG(k.hat, k.hair, k.shirt)}
+    <g class="apron"><path d="M31 81h18l2.5 17h-23z" fill="#FFF8F1"/><rect x="33.5" y="74" width="13" height="8" rx="1.5" fill="#FFF8F1"/><path d="M34 74l-3.5-5.5M46 74l3.5-5.5" stroke="#FFF8F1" stroke-width="1.5" stroke-linecap="round"/><rect x="36" y="86" width="8" height="5" rx="1.2" fill="#F7C6D4"/><path d="M40 77.5c-1.2-1.3-3-.2-2.3 1.2l2.3 2 2.3-2c.7-1.4-1.1-2.5-2.3-1.2z" fill="#E26A87"/></g>
     <g class="cup" transform="translate(48,76)">
       <path d="M0 4L12 4L10.5 20L1.5 20Z" style="fill:var(--drink)" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>
+      <path d="M.3 4.2L11.7 4.2L11.1 11L.9 11Z" style="fill:var(--drink2, var(--drink))"/>
       <rect x="-.5" y="2" width="13" height="3" rx="1.5" fill="#F7EFE6"/>
       <rect x="7" y="-6" width="2" height="9" fill="#F7EFE6" transform="rotate(12 8 -1)"/>
       <circle cx="4" cy="17" r="1.4" fill="#3A2419"/><circle cx="7.5" cy="17.5" r="1.4" fill="#3A2419"/><circle cx="6" cy="14.8" r="1.3" fill="#3A2419"/>
@@ -248,33 +332,32 @@ function spriteSVG(k) {
   </svg>`;
 }
 
-const DRINK_LIST = [
-  { name: "brown sugar pearl", cmd: "brown", color: "#C08A5B" }, { name: "taro cloud", cmd: "taro", color: "#B89BD1" },
-  { name: "matcha latte", cmd: "matcha", color: "#9DBB74" }, { name: "strawberry oolong", cmd: "strawberry", color: "#F2A2B0" },
-  { name: "thai milk tea", cmd: "thai", color: "#EDA35A" }, { name: "lychee green", cmd: "lychee", color: "#F6DC7A" },
-  { name: "honeydew", cmd: "honeydew", color: "#B8DDA8" }, { name: "black sesame", cmd: "sesame", color: "#8C8378" }
-];
-const BASE = { skin: 1, style: 0, hair: HAIR_COLORS.brown, shirt: OUTFITS.strawberry, pants: PANTS[0], hat: "none", glasses: "none", mouth: "cat" };
+const DRINK_LIST = DRINKS;
+const BASE = { skin: 1, style: 0, hair: HAIR_COLORS.brown, shirt: OUTFITS.strawberry, pants: PANTS[0], hat: "none", glasses: "none", mouth: "cat", face: "none", wear: "none" };
 const card = (look, title, sub, drink) =>
-  `<div class="item" style="--drink:${drink || "#B89BD1"}">${spriteSVG(Object.assign({}, BASE, look))}<b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>`;
+  `<div class="item" style="--drink:${(drink && drink.color) || "#B89BD1"};--drink2:${(drink && (drink.color2 || drink.color)) || "#B89BD1"}">${spriteSVG(Object.assign({}, BASE, look))}<b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>`;
 const fill = (id, html) => document.getElementById(id).innerHTML = html;
 
 fill("gHair", HAIR_STYLES.map((n, i) => card({ style: i }, `${i + 1}. ${n}`, `!hair ${i + 1}`)).join(""));
 fill("gHairColor", Object.entries(HAIR_COLORS).map(([n, c]) => card({ hair: c, style: 1 }, `<i class="sw" style="background:${c}"></i>${n}`, `!haircolor ${n}`)).join(""));
 fill("gSkin", SKIN.map((c, i) => card({ skin: i, style: 2 }, `<i class="sw" style="background:${c}"></i>${i + 1}`, `!skin ${i + 1}`)).join(""));
 fill("gOutfit", Object.entries(OUTFITS).map(([n, c]) => card({ shirt: c }, `<i class="sw" style="background:${c}"></i>${n}`, `!outfit ${n}`)).join(""));
-fill("gHat", HATS.map(h => card({ hat: h, style: h === "cat" || h === "bunny" ? 2 : 0 }, h, `!hat ${h}`)).join(""));
+fill("gHat", HATS.map(h => card({ hat: h, style: ["cat", "bunny", "bear", "fox", "panda", "puppy", "halo", "party", "witch", "chef", "boba"].includes(h) ? 2 : 0 }, h, `!hat ${h}`)).join(""));
+fill("gFace", FACES.map(f => card({ face: f, style: 2 }, f === "none" ? "none" : f, `!face ${f}`)).join(""));
+fill("gWear", WEARS.map(w => card({ wear: w }, w, `!wear ${w}`)).join(""));
+
 fill("gGlasses", GLASSES.map(g => card({ glasses: g }, g === "none" ? "off" : g, `!glasses ${g === "none" ? "off" : g}`)).join(""));
 fill("gMouth", MOUTHS.map((m, i) => card({ mouth: m }, `${i + 1}. ${m}`, `!mouth ${i + 1}`)).join(""));
-fill("gDrink", DRINK_LIST.map(d => card({}, `<i class="sw" style="background:${d.color}"></i>${d.name}`, `!drink ${d.cmd}`, d.color)).join(""));
+const bigCup = d => `<svg viewBox="0 0 60 90" width="60" height="90" style="width:60px;height:90px;margin:18px auto 18px"><path d="M10 22h40l-5 60H15z" fill="${d.color}" stroke="#fff" stroke-opacity=".7" stroke-width="1.5"/><path d="M11 23h38l-2.2 26H13.2z" fill="${d.color2 || d.color}"/><rect x="7" y="16" width="46" height="8" rx="4" fill="#F7EFE6"/><rect x="33" y="-4" width="5" height="26" rx="2" fill="#F8C0D1" transform="rotate(10 35 9)"/><g fill="#3A2419"><circle cx="22" cy="74" r="4"/><circle cx="31" cy="76" r="4"/><circle cx="39" cy="73" r="4"/><circle cx="26" cy="67" r="3.6"/><circle cx="35" cy="66" r="3.6"/></g><path d="M16 30q-1 20 2 44" stroke="#fff" stroke-width="2.4" stroke-opacity=".45" fill="none" stroke-linecap="round"/></svg>`;
+fill("gDrink", DRINK_LIST.map(d => `<div class="item">${bigCup(d)}<b>${d.name}</b><span>!drink ${d.cmd}</span></div>`).join(""));
 const seeded = seed => { let x = seed; return () => (x = (x * 16807) % 2147483647) / 2147483647; };
 const r = seeded(7);
 const pickR = a => a[Math.floor(r() * a.length)];
 fill("gRandom", [...Array(6)].map(() => card({ skin: Math.floor(r() * SKIN.length), style: Math.floor(r() * HAIR_STYLES.length), hair: pickR(Object.values(HAIR_COLORS)),
-  shirt: pickR(Object.values(OUTFITS)), pants: pickR(PANTS), hat: r() < .6 ? pickR(HATS.slice(1)) : "none", glasses: r() < .35 ? pickR(GLASSES.slice(1)) : "none", mouth: pickR(MOUTHS) }, "random", "!random")).join(""));
+  shirt: pickR(Object.values(OUTFITS)), pants: pickR(PANTS), hat: r() < .6 ? pickR(HATS.slice(1)) : "none", glasses: r() < .35 ? pickR(GLASSES.slice(1)) : "none", mouth: pickR(MOUTHS), face: r() < .4 ? pickR(FACES.slice(1)) : "none", wear: r() < .4 ? pickR(WEARS.slice(1)) : "none" }, "random", "!random")).join(""));
 
 /* builder */
-const state = { style: 0, hair: "brown", skin: 2, outfit: "strawberry", hat: "none", glasses: "off", mouth: "cat", drink: 1 };
+const state = { style: 0, hair: "brown", skin: 2, outfit: "strawberry", hat: "none", glasses: "off", mouth: "cat", face: "none", wear: "none", drink: 1 };
 const fields = [
   ["style", "Hairstyle", HAIR_STYLES.map((n, i) => [i, `${i + 1}. ${n}`])],
   ["hair", "Hair color", Object.keys(HAIR_COLORS).map(n => [n, n])],
@@ -283,6 +366,8 @@ const fields = [
   ["hat", "Hat", HATS.map(h => [h, h])],
   ["glasses", "Glasses", GLASSES.map(g => [g === "none" ? "off" : g, g === "none" ? "off" : g])],
   ["mouth", "Mouth", MOUTHS.map((m, i) => [m, `${i + 1}. ${m}`])],
+  ["face", "Face details", FACES.map(f => [f, f])],
+  ["wear", "Extras", WEARS.map(w => [w, w])],
   ["drink", "Drink", DRINK_LIST.map((d, i) => [i, d.name])]
 ];
 const controls = document.getElementById("controls");
@@ -290,13 +375,13 @@ controls.innerHTML = fields.map(([k, label, opts]) =>
   `<label>${label}<select data-k="${k}">${opts.map(([v, t]) => `<option value="${v}"${String(v) === String(state[k]) ? " selected" : ""}>${t}</option>`).join("")}</select></label>`).join("");
 function commands() {
   return [`!hair ${Number(state.style) + 1}`, `!haircolor ${state.hair}`, `!skin ${state.skin}`, `!outfit ${state.outfit}`,
-    `!hat ${state.hat}`, `!glasses ${state.glasses}`, `!mouth ${state.mouth}`, `!drink ${DRINK_LIST[state.drink].cmd}`];
+    `!hat ${state.hat}`, `!glasses ${state.glasses}`, `!mouth ${state.mouth}`, `!face ${state.face}`, `!wear ${state.wear}`, `!drink ${DRINK_LIST[state.drink].cmd}`];
 }
 function drawBuilder() {
   const d = DRINK_LIST[state.drink];
-  document.getElementById("builderPreview").style.setProperty("--drink", d.color);
+  setDrinkVars(document.getElementById("builderPreview"), d);
   document.getElementById("builderPreview").innerHTML = spriteSVG({ skin: Number(state.skin) - 1, style: Number(state.style), hair: HAIR_COLORS[state.hair],
-    shirt: OUTFITS[state.outfit], pants: PANTS[0], hat: state.hat, glasses: state.glasses === "off" ? "none" : state.glasses, mouth: state.mouth });
+    shirt: OUTFITS[state.outfit], pants: PANTS[0], hat: state.hat, glasses: state.glasses === "off" ? "none" : state.glasses, mouth: state.mouth, face: state.face, wear: state.wear });
   document.getElementById("cmds").innerHTML = commands().map(c => `<code>${c}</code>`).join("");
 }
 controls.addEventListener("change", e => { const k = e.target.dataset.k; if (k) { state[k] = e.target.value; drawBuilder(); } });
